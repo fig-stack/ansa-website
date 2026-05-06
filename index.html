@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ansa — Always Answering</title>
+  <meta name="description" content="AI phone receptionist for local businesses. Answers every call, books appointments, sends confirmations — 24/7.">
+  <meta property="og:title" content="Ansa — Always Answering">
+  <meta property="og:description" content="AI phone receptionist for local businesses. Never miss another call.">
+  <meta property="og:image" content="assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --violet: #7c3aed;
+      --purple: #a855f7;
+      --bg: #030712;
+      --bg2: #080f1f;
+      --surface: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.07);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --subtle: #1e293b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 40px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(3,7,18,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-color: var(--border);
+    }
+
+    .nav-logo img { height: 36px; width: auto; border-radius: 7px; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--violet), var(--purple));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 22px;
+      border-radius: 9px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* Mobile nav toggle */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: rgba(3,7,18,0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 24px 32px;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 99;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .mobile-menu a:hover { color: var(--text); }
+
+    .mobile-menu .nav-cta {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 15px;
+      padding: 13px 28px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      animation: drift 12s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: rgba(124,58,237,0.18);
+      top: -200px; left: -150px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: rgba(168,85,247,0.12);
+      bottom: -100px; right: -100px;
+      animation-delay: -6s;
+    }
+
+    .orb-3 {
+      width: 400px; height: 400px;
+      background: rgba(99,102,241,0.1);
+      top: 40%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -3s;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(30px, -20px) scale(1.05); }
+      66%       { transform: translate(-20px, 30px) scale(0.95); }
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c084fc;
+      letter-spacing: 0.5px;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #a855f7;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 88px);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -3px;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 24px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, #c084fc 50%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-weight: 400;
+      color: #94a3b8;
+      max-width: 560px;
+      line-height: 1.65;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 44px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 72px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.55);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.09);
+      transform: translateY(-2px);
+    }
+
+    /* Waveform */
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wave-bar {
+      width: 4px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #a855f7, #7c3aed);
+      animation: wave-anim 1.4s ease-in-out infinite;
+    }
+
+    .wave-bar:nth-child(1)  { height: 16px; animation-delay: 0.0s; }
+    .wave-bar:nth-child(2)  { height: 32px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(3)  { height: 48px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(4)  { height: 64px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(5)  { height: 48px; animation-delay: 0.4s; }
+    .wave-bar:nth-child(6)  { height: 72px; animation-delay: 0.5s; }
+    .wave-bar:nth-child(7)  { height: 56px; animation-delay: 0.6s; }
+    .wave-bar:nth-child(8)  { height: 80px; animation-delay: 0.7s; }
+    .wave-bar:nth-child(9)  { height: 64px; animation-delay: 0.6s; }
+    .wave-bar:nth-child(10) { height: 48px; animation-delay: 0.5s; }
+    .wave-bar:nth-child(11) { height: 72px; animation-delay: 0.4s; }
+    .wave-bar:nth-child(12) { height: 56px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(13) { height: 40px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(14) { height: 24px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(15) { height: 12px; animation-delay: 0.0s; }
+
+    @keyframes wave-anim {
+      0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+      50%       { transform: scaleY(1); opacity: 1; }
+    }
+
+    /* ── TRUST BAR ── */
+    .trust-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trust-divider { color: var(--subtle); }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 40px;
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #a855f7;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: #64748b;
+      line-height: 1.65;
+      max-width: 540px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 64px;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 40px 36px;
+      transition: background 0.3s;
+    }
+
+    .step:first-child { border-radius: 20px 0 0 20px; }
+    .step:last-child  { border-radius: 0 20px 20px 0; }
+    .step:hover       { background: rgba(124,58,237,0.06); }
+
+    .step-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #7c3aed;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .step-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(168,85,247,0.2));
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    .step h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.65;
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 64px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.08), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover { border-color: rgba(124,58,237,0.3); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.65;
+    }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 64px;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      position: relative;
+      transition: transform 0.3s;
+    }
+
+    .pricing-card:hover { transform: translateY(-4px); }
+
+    .pricing-card.featured {
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(168,85,247,0.08));
+      border-color: rgba(124,58,237,0.4);
+      box-shadow: 0 0 60px rgba(124,58,237,0.15);
+    }
+
+    .popular-tag {
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+    }
+
+    .plan-price {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .plan-price span { font-size: 20px; font-weight: 500; color: var(--muted); }
+
+    .plan-setup {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .plan-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .plan-features li {
+      font-size: 14px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .plan-features li::before {
+      content: '';
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.4);
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%23a855f7' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .plan-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .plan-btn.outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .plan-btn.outline:hover { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.06); }
+
+    .plan-btn.filled {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+
+    .plan-btn.filled:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ── DEMO CTA ── */
+    .demo-section {
+      background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(168,85,247,0.05));
+      border-top: 1px solid rgba(124,58,237,0.2);
+      border-bottom: 1px solid rgba(124,58,237,0.2);
+      text-align: center;
+    }
+
+    .demo-phone {
+      font-size: clamp(36px, 7vw, 72px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 24px 0 12px;
+    }
+
+    .demo-sub {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .demo-bots {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .demo-bot {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 24px;
+      text-align: left;
+      min-width: 200px;
+    }
+
+    .demo-bot-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .demo-bot-biz  { font-size: 12px; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    .contact-section { text-align: center; }
+
+    .contact-form {
+      max-width: 480px;
+      margin: 48px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .contact-form input,
+    .contact-form select,
+    .contact-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .contact-form input:focus,
+    .contact-form select:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(124,58,237,0.5);
+    }
+
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: #475569; }
+
+    .contact-form select option { background: #0f172a; }
+
+    .contact-form textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    .contact-form .submit-btn {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+
+    .contact-form .submit-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .form-success {
+      display: none;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 14px;
+      padding: 24px;
+      font-size: 15px;
+      color: #c084fc;
+      font-weight: 500;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 48px 40px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-logo img { height: 32px; border-radius: 6px; }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: #334155;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .animate {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .animate.visible { opacity: 1; transform: translateY(0); }
+    .animate-delay-1 { transition-delay: 0.1s; }
+    .animate-delay-2 { transition-delay: 0.2s; }
+    .animate-delay-3 { transition-delay: 0.3s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      section { padding: 72px 24px; }
+      .steps { grid-template-columns: 1fr; gap: 12px; }
+      .step:first-child { border-radius: 18px 18px 0 0; }
+      .step:last-child  { border-radius: 0 0 18px 18px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-grid  { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .trust-bar { padding: 18px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-ctas { flex-direction: column; width: 100%; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#"><img src="assets/logo.png" alt="Ansa"></a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#contact">Get Started</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta" style="display:none" id="nav-cta-desktop">Get Started</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#how-it-works" onclick="closeMobile()">How it works</a>
+    <a href="#features" onclick="closeMobile()">Features</a>
+    <a href="#pricing" onclick="closeMobile()">Pricing</a>
+    <a href="#demo" onclick="closeMobile()">Demo</a>
+    <a href="#contact" class="nav-cta" onclick="closeMobile()">Get Started Free</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="hero-grid"></div>
+
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      AI Receptionist for Local Businesses
+    </div>
+
+    <h1><span class="gradient-text">Never Miss<br>Another Call.</span></h1>
+
+    <p class="hero-sub">
+      Ansa answers every call, books appointments, and texts confirmations — automatically. 24 hours a day, 7 days a week. No staff required.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#contact" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        Start Free Trial
+      </a>
+      <a href="#demo" class="btn-secondary">
+        Hear a Live Demo
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="waveform">
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="trust-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Powered by Claude AI
+    </div>
+    <span class="trust-divider">·</span>
+    <div class="trust-item">Deepgram Voice</div>
+    <span class="trust-divider">·</span>
+    <div class="trust-item">Google Calendar</div>
+    <span class="trust-divider">·</span>
+    <div class="trust-item">Twilio</div>
+    <span class="trust-divider">·</span>
+    <div class="trust-item">SMS Confirmations</div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-inner">
+      <span class="section-tag animate">How it works</span>
+      <h2 class="section-title animate animate-delay-1">From call to confirmed<br>in under a minute.</h2>
+      <p class="section-sub animate animate-delay-2">Your customers call your number. Everything else is handled.</p>
+
+      <div class="steps">
+        <div class="step animate">
+          <div class="step-number">Step 01</div>
+          <div class="step-icon">📞</div>
+          <h3>Customer Calls</h3>
+          <p>Your customer calls your business number. Ansa picks up on the first ring, 24/7 — no voicemail, no hold music, no missed opportunities.</p>
+        </div>
+        <div class="step animate animate-delay-1">
+          <div class="step-number">Step 02</div>
+          <div class="step-icon">📅</div>
+          <h3>Ansa Books It</h3>
+          <p>The AI receptionist has a natural conversation, checks your Google Calendar for real availability, and locks in the appointment — all in real time.</p>
+        </div>
+        <div class="step animate animate-delay-2">
+          <div class="step-number">Step 03</div>
+          <div class="step-icon">✉️</div>
+          <h3>Confirmation Sent</h3>
+          <p>The moment the booking is confirmed, the customer gets a text with their appointment details. The event appears on your calendar instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" style="background: linear-gradient(180deg, transparent, rgba(124,58,237,0.03), transparent);">
+    <div class="section-inner">
+      <span class="section-tag animate">Features</span>
+      <h2 class="section-title animate animate-delay-1">Everything your front<br>desk does. Automated.</h2>
+      <p class="section-sub animate animate-delay-2">Ansa handles the full receptionist workflow so your team can focus on the work that actually makes money.</p>
+
+      <div class="features-grid">
+        <div class="feature-card animate">
+          <span class="feature-icon">🕐</span>
+          <h3>24/7 Availability</h3>
+          <p>Ansa never sleeps, never calls in sick, and never puts a customer on hold. Every call is answered immediately, even at 11pm on a Sunday.</p>
+        </div>
+        <div class="feature-card animate animate-delay-1">
+          <span class="feature-icon">📆</span>
+          <h3>Real-Time Booking</h3>
+          <p>Live integration with Google Calendar means Ansa checks actual availability and creates the event the second the booking is confirmed.</p>
+        </div>
+        <div class="feature-card animate animate-delay-2">
+          <span class="feature-icon">💬</span>
+          <h3>SMS Confirmations</h3>
+          <p>Every booking triggers an automatic text confirmation to the customer with their appointment date, time, and service. No follow-up needed.</p>
+        </div>
+        <div class="feature-card animate">
+          <span class="feature-icon">🔄</span>
+          <h3>Cancellations & Reschedules</h3>
+          <p>Customers can call to cancel or reschedule and Ansa handles it — looks up the appointment, confirms, and updates the calendar automatically.</p>
+        </div>
+        <div class="feature-card animate animate-delay-1">
+          <span class="feature-icon">🎙️</span>
+          <h3>Natural Conversation</h3>
+          <p>Powered by Claude AI, Ansa speaks naturally and warmly — not like a robot reading a script. Callers often don't realize they're talking to an AI.</p>
+        </div>
+        <div class="feature-card animate animate-delay-2">
+          <span class="feature-icon">⚡</span>
+          <h3>Instant Setup</h3>
+          <p>No hardware, no complicated software, no IT team required. We configure everything and have your AI receptionist live within 48 hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-inner">
+      <span class="section-tag animate">Pricing</span>
+      <h2 class="section-title animate animate-delay-1">Simple pricing.<br>No surprises.</h2>
+      <p class="section-sub animate animate-delay-2">Start with a free 30-day trial. No credit card required. Cancel anytime.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card animate">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$149<span>/mo</span></div>
+          <div class="plan-setup">+ $199 one-time setup</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>AI receptionist bot</li>
+            <li>Unlimited inbound calls</li>
+            <li>Appointment booking</li>
+            <li>SMS confirmations</li>
+            <li>Google Calendar sync</li>
+          </ul>
+          <a href="#contact" class="plan-btn outline">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card featured animate animate-delay-1">
+          <div class="popular-tag">Most Popular</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$249<span>/mo</span></div>
+          <div class="plan-setup">+ $249 one-time setup</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>Everything in Starter</li>
+            <li>Cancellations & reschedules</li>
+            <li>Priority support</li>
+            <li>Call analytics dashboard</li>
+            <li>Monthly performance report</li>
+          </ul>
+          <a href="#contact" class="plan-btn filled">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card animate animate-delay-2">
+          <div class="plan-name">Business</div>
+          <div class="plan-price">$399<span>/mo</span></div>
+          <div class="plan-setup">+ $299 one-time setup</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>Everything in Pro</li>
+            <li>Multi-line support</li>
+            <li>Custom bot name & personality</li>
+            <li>White-glove onboarding</li>
+            <li>Dedicated account manager</li>
+          </ul>
+          <a href="#contact" class="plan-btn outline">Start Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO CTA -->
+  <section id="demo" class="demo-section">
+    <div class="section-inner">
+      <span class="section-tag animate">Live Demo</span>
+      <h2 class="section-title animate animate-delay-1">Hear it for yourself.<br>Right now.</h2>
+      <p class="section-sub animate animate-delay-2" style="margin: 0 auto;">Call the number below and talk to a live AI receptionist. Book an appointment, ask about services, or just say hello.</p>
+
+      <div class="demo-phone animate animate-delay-1">(866) 502-4343</div>
+      <p class="demo-sub animate animate-delay-2">Free call · No commitment · Answers instantly</p>
+
+      <div class="demo-bots animate animate-delay-3">
+        <div class="demo-bot">
+          <div class="demo-bot-name">💅 Lina</div>
+          <div class="demo-bot-biz">Newbury Nails & Spa</div>
+        </div>
+        <div class="demo-bot">
+          <div class="demo-bot-name">✂️ Vic</div>
+          <div class="demo-bot-biz">The Cut Room Barbershop</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT / GET STARTED -->
+  <section id="contact" class="contact-section">
+    <div class="section-inner">
+      <span class="section-tag animate">Get Started</span>
+      <h2 class="section-title animate animate-delay-1">Ready to never miss<br>another call?</h2>
+      <p class="section-sub animate animate-delay-2" style="margin: 0 auto;">Fill out the form and we'll reach out within 24 hours to set up your free 30-day trial. No credit card, no commitment.</p>
+
+      <form class="contact-form animate animate-delay-2" id="contact-form">
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="text" name="business" placeholder="Business name" required>
+        <input type="tel" name="phone" placeholder="Phone number" required>
+        <input type="email" name="email" placeholder="Email address" required>
+        <select name="type">
+          <option value="" disabled selected>Type of business</option>
+          <option>Nail salon</option>
+          <option>Barber shop</option>
+          <option>Hair salon</option>
+          <option>Lash studio</option>
+          <option>Med spa</option>
+          <option>Dentist</option>
+          <option>Chiropractor</option>
+          <option>Other</option>
+        </select>
+        <button type="submit" class="submit-btn">Start My Free 30-Day Trial →</button>
+      </form>
+
+      <div class="form-success animate" id="form-success">
+        ✓ &nbsp; Got it! We'll reach out within 24 hours to get you set up.
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo"><img src="assets/logo.png" alt="Ansa"></div>
+    <ul class="footer-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#contact">Get Started</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Ansa · Always Answering · Boston, MA</div>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const navbar = document.getElementById('navbar');
+    const navCta = document.getElementById('nav-cta-desktop');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY > 40;
+      navbar.classList.toggle('scrolled', scrolled);
+      navCta.style.display = scrolled ? 'inline-flex' : 'none';
+    });
+
+    // Mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    function closeMobile() { mobileMenu.classList.remove('open'); }
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.animate').forEach(el => observer.observe(el));
+
+    // Contact form → mailto fallback (replace with Formspree or similar later)
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = new FormData(this);
+      const name = data.get('name');
+      const biz  = data.get('business');
+      const phone = data.get('phone');
+      const email = data.get('email');
+      const type  = data.get('type') || 'Not specified';
+
+      const subject = encodeURIComponent(`Ansa Free Trial — ${biz}`);
+      const body = encodeURIComponent(
+        `Name: ${name}\nBusiness: ${biz}\nType: ${type}\nPhone: ${phone}\nEmail: ${email}\n\nInterested in starting a free 30-day trial.`
+      );
+      window.location.href = `mailto:afig2207@gmail.com?subject=${subject}&body=${body}`;
+
+      this.style.display = 'none';
+      const success = document.getElementById('form-success');
+      success.style.display = 'block';
+      success.classList.add('visible');
+    });
+  </script>
+
+</body>
+</html>
